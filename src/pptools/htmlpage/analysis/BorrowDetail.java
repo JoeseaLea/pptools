@@ -70,20 +70,24 @@ public class BorrowDetail {
 					.getElementsByAttribute("div", "class", "scroll-area").get(0).getElementsByTagName("ol");
 			
 			for (HtmlElement htmlElement : bidRecordsElement) {
-				BidRecordVo bidRecordVo = new BidRecordVo();
-				bidRecordVo.setListingid(listingid);
-				bidRecordVo.setFullUsername(fullUsername);
+				try {
+					BidRecordVo bidRecordVo = new BidRecordVo();
+					bidRecordVo.setListingid(listingid);
+					bidRecordVo.setFullUsername(fullUsername);
 //				bidRecordVo.setUserName(userName);
-				
-				List<HtmlElement> liElement = htmlElement.getElementsByTagName("li");
-				
-				bidRecordVo.setBidUsername(liElement.get(0).asText().trim());
-				bidRecordVo.setPercentOfInterest(Integer.valueOf(liElement.get(1).asText().trim().replaceAll("%", ""))/100);
-				bidRecordVo.setTimeLong(liElement.get(2).asText().trim());
-				bidRecordVo.setValidBidCapital(Integer.valueOf(liElement.get(3).asText().trim().replaceAll("¥", "").replaceAll(",", "")));
-				bidRecordVo.setBidtime(liElement.get(4).asText().trim());
-				
-				bidRecords.add(bidRecordVo);
+					
+					List<HtmlElement> liElement = htmlElement.getElementsByTagName("li");
+					
+					bidRecordVo.setBidUsername(liElement.get(0).asText().trim());
+					bidRecordVo.setPercentOfInterest(Integer.valueOf(liElement.get(1).asText().trim().replaceAll("%", ""))/100);
+					bidRecordVo.setTimeLong(liElement.get(2).asText().trim());
+					bidRecordVo.setValidBidCapital(Integer.valueOf(liElement.get(3).asText().trim().replaceAll("¥", "").replaceAll(",", "")));
+					bidRecordVo.setBidtime(liElement.get(4).asText().trim());
+					
+					bidRecords.add(bidRecordVo);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -104,21 +108,25 @@ public class BorrowDetail {
 					.getElementsByAttribute("div", "class", "scroll-area").get(0).getElementsByTagName("ol");
 			
 			for (HtmlElement htmlElement : bidRecordsElement) {
-				BidDebtRecordVo bidDebtRecordVo = new BidDebtRecordVo();
-				bidDebtRecordVo.setListingid(listingid);
-				bidDebtRecordVo.setFullUsername(fullUsername);
+				try {
+					BidDebtRecordVo bidDebtRecordVo = new BidDebtRecordVo();
+					bidDebtRecordVo.setListingid(listingid);
+					bidDebtRecordVo.setFullUsername(fullUsername);
 //				bidDebtRecordVo.setUserName(userName);
-				
-				List<HtmlElement> liElement = htmlElement.getElementsByTagName("li");
-				
-				bidDebtRecordVo.setOriginalCreditorRightsUsername(liElement.get(0).asText().trim());
-				bidDebtRecordVo.setTransferAmount(Double.parseDouble(liElement.get(1).asText().trim().replaceAll("¥", "").replaceAll(",", "")));
-				bidDebtRecordVo.setTransferPrice(Double.parseDouble(liElement.get(2).asText().trim().replaceAll("¥", "").replaceAll(",", "")));
-				bidDebtRecordVo.setTransferUsername(liElement.get(3).asText().trim());
-				bidDebtRecordVo.setTransferTime(liElement.get(4).asText().trim());
-				bidDebtRecordVo.setTranserMethod(liElement.get(5).asText().trim());
-				
-				bidDebtRecords.add(bidDebtRecordVo);
+					
+					List<HtmlElement> liElement = htmlElement.getElementsByTagName("li");
+					
+					bidDebtRecordVo.setOriginalCreditorRightsUsername(liElement.get(0).asText().trim());
+					bidDebtRecordVo.setTransferAmount(Double.parseDouble(liElement.get(1).asText().trim().replaceAll("¥", "").replaceAll(",", "")));
+					bidDebtRecordVo.setTransferPrice(Double.parseDouble(liElement.get(2).asText().trim().replaceAll("¥", "").replaceAll(",", "")));
+					bidDebtRecordVo.setTransferUsername(liElement.get(3).asText().trim());
+					bidDebtRecordVo.setTransferTime(liElement.get(4).asText().trim());
+					bidDebtRecordVo.setTranserMethod(liElement.get(5).asText().trim());
+					
+					bidDebtRecords.add(bidDebtRecordVo);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -145,8 +153,12 @@ public class BorrowDetail {
 				
 				HtmlElement tableElement = null;
 				for (HtmlElement htmlElement : tableElements) {
-					if (htmlElement.asText().contains("借款标的") && htmlElement.asText().contains("借款标的")) {
-						tableElement = htmlElement;
+					try {
+						if (htmlElement.asText().contains("借款标的") && htmlElement.asText().contains("借款标的")) {
+							tableElement = htmlElement;
+							break;
+						}
+					} catch (Exception e) {
 						break;
 					}
 				}
@@ -154,21 +166,25 @@ public class BorrowDetail {
 				List<HtmlElement> trElements = tableElement.getElementsByAttribute("tr", "class", "tab-list");
 				List<HtmlElement> tdElements = null;
 				for (HtmlElement htmlElement : trElements) {
-					BorrowDetailVo borrowDetailVo = new BorrowDetailVo();
+					try {
+						BorrowDetailVo borrowDetailVo = new BorrowDetailVo();
 //					borrowDetailVo.setUsername(userName);
-					borrowDetailVo.setFullUsername(fullUsername);
-					borrowDetailVo.setListingid(listingid);
-					
-					tdElements = htmlElement.getElementsByTagName("td");
-					
-					borrowDetailVo.setBorrowBid(tdElements.get(0).asText().trim());
-					borrowDetailVo.setPercentOfInterest(Double.valueOf(tdElements.get(1).asText().trim().replaceAll("%", ""))/100);
-					borrowDetailVo.setTimeLimit(tdElements.get(2).asText().trim());
-					borrowDetailVo.setAmount(Integer.valueOf(tdElements.get(3).asText().trim().replaceAll(",", "")));
-					borrowDetailVo.setDateIssued(tdElements.get(4).asText().trim());
-					borrowDetailVo.setStatus(tdElements.get(5).asText().trim());
-					
-					borrowDetails.add(borrowDetailVo);
+						borrowDetailVo.setFullUsername(fullUsername);
+						borrowDetailVo.setListingid(listingid);
+						
+						tdElements = htmlElement.getElementsByTagName("td");
+						
+						borrowDetailVo.setBorrowBid(tdElements.get(0).asText().trim());
+						borrowDetailVo.setPercentOfInterest(Double.valueOf(tdElements.get(1).asText().trim().replaceAll("%", ""))/100);
+						borrowDetailVo.setTimeLimit(tdElements.get(2).asText().trim());
+						borrowDetailVo.setAmount(Integer.valueOf(tdElements.get(3).asText().trim().replaceAll(",", "")));
+						borrowDetailVo.setDateIssued(tdElements.get(4).asText().trim());
+						borrowDetailVo.setStatus(tdElements.get(5).asText().trim());
+						
+						borrowDetails.add(borrowDetailVo);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
 			
@@ -333,19 +349,27 @@ public class BorrowDetail {
 					//未来6个月的待还记录
 					TagNode[] tdArr = HtmlCleanerUtils.getMultiNode(tableArr[1], "//tr[1]/td");
 					for (TagNode tagNode : tdArr) {
-						NeedReturnRecordNext6MonthVo needReturnRecordNext6MonthVo = new NeedReturnRecordNext6MonthVo();
-						
-						needReturnRecordNext6MonthVo.setListingid(this.listingid);
-						needReturnRecordNext6MonthVo.setFullUsername(this.fullUsername);
-						needReturnRecordNext6MonthVo.setDateTime(tagNode.getText().toString().trim());
-						
-						needReturnRecordNext6MonthVos.add(needReturnRecordNext6MonthVo);
+						try {
+							NeedReturnRecordNext6MonthVo needReturnRecordNext6MonthVo = new NeedReturnRecordNext6MonthVo();
+							
+							needReturnRecordNext6MonthVo.setListingid(this.listingid);
+							needReturnRecordNext6MonthVo.setFullUsername(this.fullUsername);
+							needReturnRecordNext6MonthVo.setDateTime(tagNode.getText().toString().trim());
+							
+							needReturnRecordNext6MonthVos.add(needReturnRecordNext6MonthVo);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 					
 					tdArr = HtmlCleanerUtils.getMultiNode(tableArr[1], "//tr[2]/td");
 					for (int i = 0; i < tdArr.length; i++) {
-						double amount = Double.valueOf(tdArr[i].getText().toString().replace("¥", "").replace(",", "").trim());
-						needReturnRecordNext6MonthVos.get(i).setAmount(amount);
+						try {
+							double amount = Double.valueOf(tdArr[i].getText().toString().replace("¥", "").replace(",", "").trim());
+							needReturnRecordNext6MonthVos.get(i).setAmount(amount);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			}
@@ -366,19 +390,27 @@ public class BorrowDetail {
 						//过去6个月有回款记录的逾期天数
 						TagNode[] tdArr = HtmlCleanerUtils.getMultiNode(tableArr[2], "//tr[1]/td");
 						for(TagNode tdNode : tdArr){
-							OverTimeRecordLast6MonthVo overTimeRecordLast6MonthVo = new OverTimeRecordLast6MonthVo();
-							
-							overTimeRecordLast6MonthVo.setListingid(this.listingid);
-							overTimeRecordLast6MonthVo.setFullUsername(this.fullUsername);
-							overTimeRecordLast6MonthVo.setDateTime(tdNode.getText().toString().trim());
-							
-							overTimeRecordLast6MonthVos.add(overTimeRecordLast6MonthVo);
+							try {
+								OverTimeRecordLast6MonthVo overTimeRecordLast6MonthVo = new OverTimeRecordLast6MonthVo();
+								
+								overTimeRecordLast6MonthVo.setListingid(this.listingid);
+								overTimeRecordLast6MonthVo.setFullUsername(this.fullUsername);
+								overTimeRecordLast6MonthVo.setDateTime(tdNode.getText().toString().trim());
+								
+								overTimeRecordLast6MonthVos.add(overTimeRecordLast6MonthVo);
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
 						}
 						
 						tdArr = HtmlCleanerUtils.getMultiNode(tableArr[2], "//tr[2]/td");
 						for (int i = 0; i < tdArr.length; i++) {
-							int dayNumber = Integer.valueOf(tdArr[i].getText().toString().trim());
-							overTimeRecordLast6MonthVos.get(i).setDayNumber(dayNumber);
+							try {
+								int dayNumber = Integer.valueOf(tdArr[i].getText().toString().trim());
+								overTimeRecordLast6MonthVos.get(i).setDayNumber(dayNumber);
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
 						}
 					}
 				}

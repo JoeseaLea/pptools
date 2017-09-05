@@ -48,10 +48,10 @@ public class PPDmain {
 			
 			String username = PropertiesUtil.getInstance().getProperty("username", "zhangsan");
 			String password = PropertiesUtil.getInstance().getProperty("password", "******");
+			//登录
 			htmlPage = PPDtools.login(username, password);
 			// 获取黑名单页面
 			htmlPage = PPDtools.getUrlPage("http://invest.ppdai.com/account/blacklist?LateDayTo=1&LateDayFrom=#list");
-//			htmlPage = PPDtools.getUrlPage("file:///E:/ppdai/%E9%BB%91%E5%90%8D%E5%8D%951.html");
 			
 			List<BlacklistVo> blacklist = null;
 			List<RepaymentDetailVo> repaymentDetails = null;
@@ -72,72 +72,81 @@ public class PPDmain {
 			String listingid = null;
 			
 			while (true) {
-				//获取黑名单信息
-				blacklist = bk.getBlackListInfo(htmlPage);
-				//保存黑名单信息
-				blackListDao.addBlackLists(blacklist);
-				
-				//获取黑名单还款详情页面
-				htmlPage = bk.getRepaymentDetailsHtmlPage(htmlPage);
-				
-				//获取黑名单还款详情
-				repaymentDetails = bk.getRepaymentDetails(htmlPage);
-				//保存黑名单还款详情
-				blackListDao.addRepaymentDetails(repaymentDetails);
-				
-				//获取所有手机app用户的闪电借款按钮
-				List<HtmlElement> trRepaymentDetailslist = bk.getBlacklistdetailURL(htmlPage);
-				for (HtmlElement htmlElement : trRepaymentDetailslist) {
-					url = htmlElement.getOneHtmlElementByAttribute("a", "class", "c39a1ea fs16").getAttribute("href");
-					listingid = htmlElement.getAttribute("listingid");
+				try {
+					//获取黑名单信息
+					blacklist = bk.getBlackListInfo(htmlPage);
+					//保存黑名单信息
+					blackListDao.addBlackLists(blacklist);
 					
-					htmlDetailPage = PPDtools.getUrlPage(url);
+					//获取黑名单还款详情页面
+					htmlPage = bk.getRepaymentDetailsHtmlPage(htmlPage);
 					
-					//保存htmlDetailPage文件
-					saveHtmlPage(url, htmlDetailPage.asXml());
+					//获取黑名单还款详情
+					repaymentDetails = bk.getRepaymentDetails(htmlPage);
+					//保存黑名单还款详情
+					blackListDao.addRepaymentDetails(repaymentDetails);
 					
-					//加载网页
-					bd.loadPage(htmlDetailPage, listingid);
+					//获取所有手机app用户的闪电借款按钮
+					List<HtmlElement> trRepaymentDetailslist = bk.getBlacklistdetailURL(htmlPage);
+					for (HtmlElement htmlElement : trRepaymentDetailslist) {
+						try {
+							url = htmlElement.getOneHtmlElementByAttribute("a", "class", "c39a1ea fs16").getAttribute("href");
+							listingid = htmlElement.getAttribute("listingid");
+							
+							htmlDetailPage = PPDtools.getUrlPage(url);
+							
+							//保存htmlDetailPage文件
+							saveHtmlPage(url, htmlDetailPage.asXml());
+							
+							//加载网页
+							bd.loadPage(htmlDetailPage, listingid);
+							
+							borrowDetailPageVo = bd.getBorrowDetailPageVo();
+							borrowDetailDao.addBorrowDetailPageVo(borrowDetailPageVo);
+							
+							//获取投标记录数据
+							bidRecords = bd.getBidRecords();
+							//插入投标记录数据到数据库
+							borrowDetailDao.addBidRecords(bidRecords);
+							
+							//获取债权转让记录数据
+							bidDebtRecords = bd.getBidDebtRecords();
+							//插入债权转让记录数据到数据库
+							borrowDetailDao.addBidDebtRecords(bidDebtRecords);
+							
+							//获取借款记录数据
+							borrowDetails = bd.getBorrowDetails();
+							//插入借款记录数据到数据库
+							borrowDetailDao.addBorrowDetails(borrowDetails);
+							
+							//获取未来6个月的待还记录数据
+							needReturnRecordNext6MonthVos = bd.getNeedReturnRecordNext6MonthVos();
+							//插入未来6个月的待还记录数据到数据库
+							borrowDetailDao.addNeedReturnRecordNext6MonthVos(needReturnRecordNext6MonthVos);
+							
+							//获取过去6个月有回款记录的逾期天数数据
+							overTimeRecordLast6MonthVos = bd.getOverTimeRecordLast6MonthVos();
+							//插入过去6个月有回款记录的逾期天数到数据库
+							borrowDetailDao.addOverTimeRecordLast6MonthVos(overTimeRecordLast6MonthVos);
+							
+							blackListDao.updateFullUserName(bd.getFullUsername(), bd.getListingid());
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
 					
-					borrowDetailPageVo = bd.getBorrowDetailPageVo();
-					borrowDetailDao.addBorrowDetailPageVo(borrowDetailPageVo);
+					if (bk.isLastPage(htmlPage)) {
+						break;
+					} else {
+						htmlPage = PPDtools.getUrlPage(bk.getNextHtmlPageURL(htmlPage));
+					}
 					
-					//获取投标记录数据
-					bidRecords = bd.getBidRecords();
-					//插入投标记录数据到数据库
-					borrowDetailDao.addBidRecords(bidRecords);
-					
-					//获取债权转让记录数据
-					bidDebtRecords = bd.getBidDebtRecords();
-					//插入债权转让记录数据到数据库
-					borrowDetailDao.addBidDebtRecords(bidDebtRecords);
-					
-					//获取借款记录数据
-					borrowDetails = bd.getBorrowDetails();
-					//插入借款记录数据到数据库
-					borrowDetailDao.addBorrowDetails(borrowDetails);
-					
-					//获取未来6个月的待还记录数据
-					needReturnRecordNext6MonthVos = bd.getNeedReturnRecordNext6MonthVos();
-					//插入未来6个月的待还记录数据到数据库
-					borrowDetailDao.addNeedReturnRecordNext6MonthVos(needReturnRecordNext6MonthVos);
-					
-					//获取过去6个月有回款记录的逾期天数数据
-					overTimeRecordLast6MonthVos = bd.getOverTimeRecordLast6MonthVos();
-					//插入过去6个月有回款记录的逾期天数到数据库
-					borrowDetailDao.addOverTimeRecordLast6MonthVos(overTimeRecordLast6MonthVos);
-					
-					blackListDao.updateFullUserName(bd.getFullUsername(), bd.getListingid());
+					PPDUtil.sleep(Integer.valueOf(PropertiesUtil.getInstance().getProperty("interval_time", "1000")));
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-				
-				if (bk.isLastPage(htmlPage)) {
-					break;
-				} else {
-					htmlPage = PPDtools.getUrlPage(bk.getNextHtmlPageURL(htmlPage));
-				}
-				
-				PPDUtil.sleep(Integer.valueOf(PropertiesUtil.getInstance().getProperty("interval_time", "1000")));
 			}
+			
 		} catch (FailingHttpStatusCodeException e) {
 			e.printStackTrace();
 		} catch (MalformedURLException e) {
@@ -145,6 +154,7 @@ public class PPDmain {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		ctx.close();
 	}
 
 	/**
@@ -154,11 +164,15 @@ public class PPDmain {
 	 * @param htmlPageContent html页面内容
 	 */
 	private static void saveHtmlPage(String url, String htmlPageContent) {
-		String[] urlSplit = url.split("/");
-		String htmlFileName = urlSplit[urlSplit.length - 1];
-		
-		String filePath = PropertiesUtil.getInstance().getProperty("file_path", "D:\\ppdai") + File.separator + htmlFileName + ".html";
-		
-		FileUtils.writeFile(filePath, htmlPageContent);
+		try {
+			String[] urlSplit = url.split("/");
+			String htmlFileName = urlSplit[urlSplit.length - 1];
+			
+			String filePath = PropertiesUtil.getInstance().getProperty("file_path", "D:\\ppdai") + File.separator + htmlFileName + ".html";
+			
+			FileUtils.writeFile(filePath, htmlPageContent);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

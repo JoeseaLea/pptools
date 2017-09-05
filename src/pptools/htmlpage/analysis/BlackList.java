@@ -1,6 +1,5 @@
 package pptools.htmlpage.analysis;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,22 +35,25 @@ public class BlackList{
 		List<HtmlElement> tdList;
 		List<BlacklistVo> blacklist = new ArrayList<BlacklistVo>();
 		for (int i = 1; i < trList.size() - 2; i++) {
-			
-			BlacklistVo blacklistVo = new BlacklistVo();
-			
-			tdList = trList.get(i).getElementsByTagName("td");
-			if (tdList.size() == 6) {
-				blacklistVo.setUsername(tdList.get(0).asText());
-				blacklistVo.setListingid(tdList.get(0).getElementsByTagName("span").get(1).getAttribute("listingid"));
-				String[] capitals = tdList.get(1).asText().replaceAll(" ", "").replaceAll("¥", "").split("/");
-				blacklistVo.setOverdueCapital(Double.valueOf(capitals[0]));
-				blacklistVo.setGiveBackCapital(Double.valueOf(capitals[1]));
-				blacklistVo.setBidCapital(Double.valueOf(capitals[2]));
-				String[] overdays = tdList.get(3).asText().replaceAll(" ", "").replaceAll("天", "").replaceAll("）", "").split("（");
-				blacklistVo.setOverDays(Integer.valueOf(overdays[0]));
-				blacklistVo.setMaxOverDays(Integer.valueOf(overdays[1]));
-				blacklistVo.setPercentOfGetBack(Integer.valueOf(tdList.get(4).asText().trim().replaceAll("%", ""))/100);
-				blacklist.add(blacklistVo);
+			try {
+				BlacklistVo blacklistVo = new BlacklistVo();
+				
+				tdList = trList.get(i).getElementsByTagName("td");
+				if (tdList.size() == 6) {
+					blacklistVo.setUsername(tdList.get(0).asText());
+					blacklistVo.setListingid(tdList.get(0).getElementsByTagName("span").get(1).getAttribute("listingid"));
+					String[] capitals = tdList.get(1).asText().replaceAll(" ", "").replaceAll("¥", "").split("/");
+					blacklistVo.setOverdueCapital(Double.valueOf(capitals[0]));
+					blacklistVo.setGiveBackCapital(Double.valueOf(capitals[1]));
+					blacklistVo.setBidCapital(Double.valueOf(capitals[2]));
+					String[] overdays = tdList.get(3).asText().replaceAll(" ", "").replaceAll("天", "").replaceAll("）", "").split("（");
+					blacklistVo.setOverDays(Integer.valueOf(overdays[0]));
+					blacklistVo.setMaxOverDays(Integer.valueOf(overdays[1]));
+					blacklistVo.setPercentOfGetBack(Integer.valueOf(tdList.get(4).asText().trim().replaceAll("%", ""))/100);
+					blacklist.add(blacklistVo);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		
@@ -76,16 +78,15 @@ public class BlackList{
 		 * 展开所有黑名单还款详情
 		 */
 		for (int i = 1; i < trList.size() - 2; i++) {
-			tdList = trList.get(i).getElementsByTagName("td");
-			if (tdList.size() == 6) {
-				try {
+			try {
+				tdList = trList.get(i).getElementsByTagName("td");
+				if (tdList.size() == 6) {
 					htmlPage = tdList.get(0).getElementsByTagName("span").get(1).click();
-				} catch (IOException e) {
-					e.printStackTrace();
 				}
-				
-				PPDUtil.sleep(Integer.valueOf(PropertiesUtil.getInstance().getProperty("interval_time", "1000")));
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
+			PPDUtil.sleep(Integer.valueOf(PropertiesUtil.getInstance().getProperty("interval_time", "1000")));
 		}
 		
 		return htmlPage;
@@ -117,20 +118,24 @@ public class BlackList{
 			trTemp = htmlElement.getElementsByTagName("table").get(0).getElementsByTagName("tr");
 			int sequence = 1;
 			for (int i = 1; i < trTemp.size(); i++) {
-				RepaymentDetailVo repaymentDetailVo = new RepaymentDetailVo();
-				tdTemp = trTemp.get(i).getElementsByTagName("td");
-				repaymentDetailVo.setListingid(htmlElement.getAttribute("listingid"));
-				repaymentDetailVo.setReturnDate(tdTemp.get(0).asText());
-				repaymentDetailVo.setWithdraw(Double.valueOf(tdTemp.get(1).asText().replaceAll("¥", "")));
-				repaymentDetailVo.setNotWithdraw(Double.valueOf(tdTemp.get(2).asText().replaceAll("¥", "")));
-				repaymentDetailVo.setNotGetBackCapital(Double.valueOf(tdTemp.get(3).asText().replaceAll("¥", "")));
-				repaymentDetailVo.setNotGetInterest(Double.valueOf(tdTemp.get(4).asText().replaceAll("¥", "")));
-				repaymentDetailVo.setOverTimeInterest(Double.valueOf(tdTemp.get(5).asText().split("/")[0].replaceAll("¥", "")));
-				repaymentDetailVo.setOverDays(Integer.valueOf(tdTemp.get(5).asText().split("/")[1]));
-				repaymentDetailVo.setStatus(tdTemp.get(6).asText());
-				repaymentDetailVo.setSequence(sequence ++);
-				
-				repaymentDetails.add(repaymentDetailVo);
+				try {
+					RepaymentDetailVo repaymentDetailVo = new RepaymentDetailVo();
+					tdTemp = trTemp.get(i).getElementsByTagName("td");
+					repaymentDetailVo.setListingid(htmlElement.getAttribute("listingid"));
+					repaymentDetailVo.setReturnDate(tdTemp.get(0).asText());
+					repaymentDetailVo.setWithdraw(Double.valueOf(tdTemp.get(1).asText().replaceAll("¥", "")));
+					repaymentDetailVo.setNotWithdraw(Double.valueOf(tdTemp.get(2).asText().replaceAll("¥", "")));
+					repaymentDetailVo.setNotGetBackCapital(Double.valueOf(tdTemp.get(3).asText().replaceAll("¥", "")));
+					repaymentDetailVo.setNotGetInterest(Double.valueOf(tdTemp.get(4).asText().replaceAll("¥", "")));
+					repaymentDetailVo.setOverTimeInterest(Double.valueOf(tdTemp.get(5).asText().split("/")[0].replaceAll("¥", "")));
+					repaymentDetailVo.setOverDays(Integer.valueOf(tdTemp.get(5).asText().split("/")[1]));
+					repaymentDetailVo.setStatus(tdTemp.get(6).asText());
+					repaymentDetailVo.setSequence(sequence ++);
+					
+					repaymentDetails.add(repaymentDetailVo);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		
@@ -152,12 +157,6 @@ public class BlackList{
 		HtmlBody htmlBody = (HtmlBody)htmlPage.getElementsByTagName("body").get(0);
 		trRepaymentDetailslist = htmlBody.getElementsByAttribute("tr", "class", "blacklistdetail dn");
 		
-		/*String url = null;
-		for (HtmlElement htmlElement : trRepaymentDetailslist) {
-			url = htmlElement.getOneHtmlElementByAttribute("a", "class", "c39a1ea fs16").getAttribute("href");
-			aURLList.add(url);
-		}*/
-		
 		return trRepaymentDetailslist;
 	}
 	
@@ -169,15 +168,21 @@ public class BlackList{
 	 * @return
 	 */
 	public boolean isLastPage(HtmlPage htmlPage) {
-		HtmlBody htmlBody = (HtmlBody)htmlPage.getElementsByTagName("body").get(0);
-		List<HtmlElement> spans = htmlBody.getElementsByAttribute("span", "class", "pagerstatus");
-		List<HtmlElement> alist = htmlBody.getElementsByAttribute("a", "class", "currentpage");
-		
-		if (Integer.valueOf(spans.get(0).asText().trim().replaceAll("共", "").replaceAll("页", ""))
-				> Integer.valueOf(alist.get(0).asText().trim())) {
-			return false;
+		//TODO
+		try {
+			HtmlBody htmlBody = (HtmlBody)htmlPage.getElementsByTagName("body").get(0);
+			List<HtmlElement> spans = htmlBody.getElementsByAttribute("span", "class", "pagerstatus");
+			List<HtmlElement> alist = htmlBody.getElementsByAttribute("a", "class", "currentpage");
+			
+			if (Integer.valueOf(spans.get(0).asText().trim().replaceAll("共", "").replaceAll("页", ""))
+					> Integer.valueOf(alist.get(0).asText().trim())) {
+				return false;
+			}
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		return true;
+		return false;
 	}
 	
 	/**
@@ -187,14 +192,18 @@ public class BlackList{
 	 * @return
 	 */
 	public String getNextHtmlPageURL(HtmlPage htmlPage) {
-		HtmlBody htmlBody = (HtmlBody)htmlPage.getElementsByTagName("body").get(0);
-		List<HtmlElement> spans = htmlBody.getElementsByAttribute("span", "class", "pagerstatus");
-		List<HtmlElement> alist = htmlBody.getElementsByAttribute("a", "class", "currentpage");
-		
-		if (Integer.valueOf(spans.get(0).asText().trim().replaceAll("共", "").replaceAll("页", ""))
-				> Integer.valueOf(alist.get(0).asText().trim())) {
-			String nextUrl = "http://invest.ppdai.com" + htmlBody.getElementsByAttribute("a", "class", "nextpage").get(0).getAttribute("href");
-			return nextUrl;
+		try {
+			HtmlBody htmlBody = (HtmlBody)htmlPage.getElementsByTagName("body").get(0);
+			List<HtmlElement> spans = htmlBody.getElementsByAttribute("span", "class", "pagerstatus");
+			List<HtmlElement> alist = htmlBody.getElementsByAttribute("a", "class", "currentpage");
+			
+			if (Integer.valueOf(spans.get(0).asText().trim().replaceAll("共", "").replaceAll("页", ""))
+					> Integer.valueOf(alist.get(0).asText().trim())) {
+				String nextUrl = "http://invest.ppdai.com" + htmlBody.getElementsByAttribute("a", "class", "nextpage").get(0).getAttribute("href");
+				return nextUrl;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return "";
 	}
