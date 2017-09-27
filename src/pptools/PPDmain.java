@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
+import java.util.Random;
 
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -20,6 +21,7 @@ import pptools.htmlpage.analysis.BlackList;
 import pptools.htmlpage.analysis.BorrowDetail;
 import pptools.utils.FileUtils;
 import pptools.utils.PPDUtil;
+import pptools.utils.PPDtools;
 import pptools.utils.PropertiesUtil;
 import pptools.vo.BidDebtRecordVo;
 import pptools.vo.BidRecordVo;
@@ -48,10 +50,30 @@ public class PPDmain {
 			
 			String username = PropertiesUtil.getInstance().getProperty("username", "zhangsan");
 			String password = PropertiesUtil.getInstance().getProperty("password", "******");
+			
+			int maxLoginTimes = 20;
+			Random r = new Random();
+			
 			//登录
-			htmlPage = PPDtools.login(username, password);
+			for (int i = 1; i <= maxLoginTimes; i ++) {
+				htmlPage = PPDtools.login(username, password);
+				if (PPDtools.isLoginSuccess()) {
+					break;
+				}
+				
+				if (maxLoginTimes == i) {
+					System.out.println("已经连续" + maxLoginTimes + "次登录失败，请确保账户没在其他地方已经登录。");
+					return;
+				}
+				try {
+					Thread.sleep(r.nextInt(5000));
+				} catch (InterruptedException e) { }
+			}
+			
+			htmlPage = PPDtools.getUrlPage("http://invest.ppdai.com/account/lend");
+			System.out.println(htmlPage.asText());
 			// 获取黑名单页面
-			htmlPage = PPDtools.getUrlPage("http://invest.ppdai.com/account/blacklist?LateDayTo=1&LateDayFrom=#list");
+			htmlPage = PPDtools.getUrlPage("http://invest.ppdai.com/account/blacklistnew");
 			
 			List<BlacklistVo> blacklist = null;
 			List<RepaymentDetailVo> repaymentDetails = null;
@@ -74,7 +96,7 @@ public class PPDmain {
 			while (true) {
 				try {
 					//获取黑名单信息
-					blacklist = bk.getBlackListInfo(htmlPage);
+					blacklist = bk.getBlackListInfoNew(htmlPage);
 					//保存黑名单信息
 					blackListDao.addBlackLists(blacklist);
 					

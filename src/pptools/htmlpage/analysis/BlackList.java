@@ -61,6 +61,49 @@ public class BlackList{
 	}
 	
 	/**
+	 * 获取黑名单信息(新版黑名单网页)<br>
+	 * 说明：提取网页中所有黑名单信息，包含黑名单的用户名、逾期本金、已还金额、投标金额、逾期天数、最大逾期天数、催收成功可能性等数据，
+	 * @param htmlPage 黑名单网页
+	 * @return blacklist 黑名单信息
+	 */
+	public List<BlacklistVo> getBlackListInfoNew(HtmlPage htmlPage) {
+		if (null == htmlPage.getElementsByTagName("table") || htmlPage.getElementsByTagName("table").size() <= 0) {
+			return null;
+		}
+		
+		HtmlTable htmlTable = (HtmlTable)htmlPage.getElementsByTagName("table").get(0);
+		List<HtmlElement> trList = htmlTable.getElementsByTagName("tr");
+		
+		System.out.println(htmlTable.asText());
+		List<HtmlElement> tdList;
+		List<BlacklistVo> blacklist = new ArrayList<BlacklistVo>();
+		for (int i = 1; i < trList.size() - 2; i++) {
+			try {
+				BlacklistVo blacklistVo = new BlacklistVo();
+				
+				tdList = trList.get(i).getElementsByTagName("td");
+				if (tdList.size() == 6) {
+					blacklistVo.setUsername(tdList.get(0).asText());
+					blacklistVo.setListingid(tdList.get(0).getElementsByTagName("span").get(1).getAttribute("listingid"));
+					String[] capitals = tdList.get(1).asText().replaceAll(" ", "").replaceAll("¥", "").split("/");
+					blacklistVo.setOverdueCapital(Double.valueOf(capitals[0]));
+					blacklistVo.setGiveBackCapital(Double.valueOf(capitals[1]));
+					blacklistVo.setBidCapital(Double.valueOf(capitals[2]));
+					String[] overdays = tdList.get(3).asText().replaceAll(" ", "").replaceAll("天", "").replaceAll("）", "").split("（");
+					blacklistVo.setOverDays(Integer.valueOf(overdays[0]));
+					blacklistVo.setMaxOverDays(Integer.valueOf(overdays[1]));
+					blacklistVo.setPercentOfGetBack(Integer.valueOf(tdList.get(4).asText().trim().replaceAll("%", ""))/100);
+					blacklist.add(blacklistVo);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return blacklist;
+	}
+	
+	/**
 	 * 获取黑名单还款详情页面<br>
 	 * @param htmlPage 黑名单网页
 	 * @return htmlPage 黑名单还款详情页面

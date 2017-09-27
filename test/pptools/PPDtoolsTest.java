@@ -8,6 +8,8 @@ import org.junit.Test;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
+import pptools.utils.PPDtools;
+
 public class PPDtoolsTest {
 
 	@Test
