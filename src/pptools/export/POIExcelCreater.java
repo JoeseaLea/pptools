@@ -16,7 +16,7 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.util.IOUtils;
 
-import pptools.utils.StringUtils;
+import pptools.utils.StringUtil;
 import pptools.vo.ColumnMetaDataVo;
 
 public class POIExcelCreater extends AbstractExcelCreater {
@@ -141,7 +141,7 @@ public class POIExcelCreater extends AbstractExcelCreater {
 				
 				HSSFCell cell = detailRow.createCell(startColIndex + getSeqCount() + col);
 				cell.setCellType(HSSFCell.CELL_TYPE_STRING);
-				if(StringUtils.isNotEmpty(rowValue.get(md.getName()))){
+				if(StringUtil.isNotEmpty(rowValue.get(md.getName()))){
 					cell.setCellValue(new HSSFRichTextString(rowValue.get(md.getName())));
 				}else{
 					cell.setCellValue(new HSSFRichTextString(" "));

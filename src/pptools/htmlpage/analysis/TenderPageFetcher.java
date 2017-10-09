@@ -6,8 +6,8 @@ import java.util.List;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
-import pptools.utils.FileUtils;
-import pptools.utils.PPDtools;
+import pptools.utils.FileUtil;
+import pptools.utils.PPDtool;
 import pptools.utils.PropertiesUtil;
 
 /**
@@ -42,7 +42,7 @@ public class TenderPageFetcher {
 	private void login()throws Exception{
         String username = PropertiesUtil.getInstance().getProperty("username");
         String password = PropertiesUtil.getInstance().getProperty("password");
-        PPDtools.login(username, password);
+        PPDtool.login(username, password);
 	}
 	
 	/**
@@ -61,7 +61,7 @@ public class TenderPageFetcher {
 			}
 			
 			//页面抓取
-			HtmlPage htmlPage = PPDtools.getUrlPage(pageUrl);
+			HtmlPage htmlPage = PPDtool.getUrlPage(pageUrl);
 	        
 	        //投标记录列表数据
 	        @SuppressWarnings("rawtypes")
@@ -82,10 +82,10 @@ public class TenderPageFetcher {
 		        			File pageFile = new File(pageFilePath);
 		        			if(!pageFile.exists()){
 			        			//页面内容
-			        			HtmlPage detailPage = PPDtools.getUrlPage(pageFullPath);
+			        			HtmlPage detailPage = PPDtool.getUrlPage(pageFullPath);
 			        			String pageContent = detailPage.asXml();
 			        			
-		        				FileUtils.writeFile(pageFilePath, pageContent);
+		        				FileUtil.writeFile(pageFilePath, pageContent);
 		        			}
 		        		}
 	        		}catch(Exception ex){

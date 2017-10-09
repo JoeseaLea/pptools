@@ -10,8 +10,8 @@ import com.gargoylesoftware.htmlunit.html.HtmlBody;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
-import pptools.utils.HtmlCleanerUtils;
-import pptools.utils.StringUtils;
+import pptools.utils.HtmlCleanerUtil;
+import pptools.utils.StringUtil;
 import pptools.vo.BidDebtRecordVo;
 import pptools.vo.BidRecordVo;
 import pptools.vo.BorrowDetailPageVo;
@@ -205,65 +205,65 @@ public class BorrowDetail {
 			bean.setListingid(this.listingid);
 			
 			//魔镜等级
-			TagNode tagNode = HtmlCleanerUtils.getSingleNode(rootNode, "//div[@class='newLendDetailInfoLeft']/a[@class='altQust']/span");
+			TagNode tagNode = HtmlCleanerUtil.getSingleNode(rootNode, "//div[@class='newLendDetailInfoLeft']/a[@class='altQust']/span");
 			if(tagNode != null){
-				String creditRating = StringUtils.trimToEmpty(tagNode.getAttributeByName("class")).replace("creditRating", "").trim();
+				String creditRating = StringUtil.trimToEmpty(tagNode.getAttributeByName("class")).replace("creditRating", "").trim();
 				bean.setLevel(creditRating);
 			}
 
 			
-			TagNode[] tagNodes = HtmlCleanerUtils.getMultiNode(rootNode, "//div[@class='newLendDetailMoneyLeft']/dl");
+			TagNode[] tagNodes = HtmlCleanerUtil.getMultiNode(rootNode, "//div[@class='newLendDetailMoneyLeft']/dl");
 			if(tagNodes != null){
 				TagNode node;
 				
 				//借款金额
-				node = HtmlCleanerUtils.getSingleElementByName(tagNodes[0], "dd");
+				node = HtmlCleanerUtil.getSingleElementByName(tagNodes[0], "dd");
 				if(node != null){
 					bean.setBorrowAmount(Integer.valueOf(node.getText().toString().replace("¥", "").replace(",", "").trim()));
 				}
 				
 				//年利率
-				node = HtmlCleanerUtils.getSingleElementByName(tagNodes[1], "dd");
+				node = HtmlCleanerUtil.getSingleElementByName(tagNodes[1], "dd");
 				if(node != null){
 					bean.setAnnualInterestRate(Double.valueOf(node.getText().toString().replace("%", "").trim())/100);
 				}
 				
 				//期限
-				node = HtmlCleanerUtils.getSingleElementByName(tagNodes[2], "dd");
+				node = HtmlCleanerUtil.getSingleElementByName(tagNodes[2], "dd");
 				if(node != null){
 					bean.setTimeLimit(node.getText().toString().replaceAll(" ", "").replaceAll("\n\r", "").replaceAll("\n", "").replaceAll("\r", "").trim());
 				}
 			}
 			
 			//还款方式
-			TagNode repayMethodNode = HtmlCleanerUtils.getSingleNode(rootNode, "//div[@class='newLendDetailRefundLeft']//div[@class='part mb16 clearfix']//div[@class='item w260']");
+			TagNode repayMethodNode = HtmlCleanerUtil.getSingleNode(rootNode, "//div[@class='newLendDetailRefundLeft']//div[@class='part mb16 clearfix']//div[@class='item w260']");
 			bean.setReturnMethod(repayMethodNode.getText().toString().replaceAll("\"", "").split(": ")[1].trim());
 			
 			//投标人数
-			TagNode bidNumberNode = HtmlCleanerUtils.getSingleNode(rootNode, "//div[@class='newLendDetailRefundLeft']//div[@class='part clearfix']//div[@class='item w164']");
+			TagNode bidNumberNode = HtmlCleanerUtil.getSingleNode(rootNode, "//div[@class='newLendDetailRefundLeft']//div[@class='part clearfix']//div[@class='item w164']");
 			bean.setBidNumber(Integer.valueOf(bidNumberNode.getText().toString().split("：")[1].replaceAll("人", "").trim()));
 			
 			
 			
 			//还款结束时间
-			TagNode repayEndTimeNode = HtmlCleanerUtils.getSingleNode(rootNode, "//div[@class='newLendDetailRefundLeft']//div[@class='item']");
+			TagNode repayEndTimeNode = HtmlCleanerUtil.getSingleNode(rootNode, "//div[@class='newLendDetailRefundLeft']//div[@class='item']");
 			if(repayEndTimeNode != null){
-				if(StringUtils.trimToEmpty(repayEndTimeNode.getText().toString()).indexOf("结束时间") >= 0){
-					String leftTime = HtmlCleanerUtils.getSingleNodeText(repayEndTimeNode, "//span[@id='leftTime']/text()");
+				if(StringUtil.trimToEmpty(repayEndTimeNode.getText().toString()).indexOf("结束时间") >= 0){
+					String leftTime = HtmlCleanerUtil.getSingleNodeText(repayEndTimeNode, "//span[@id='leftTime']/text()");
 					bean.setEndReturnTime(leftTime);
 				}
 			}
 			
-			tagNodes = HtmlCleanerUtils.getMultiNode(rootNode, "//div[@class='main']//div[@class='tab-contain']");
+			tagNodes = HtmlCleanerUtil.getMultiNode(rootNode, "//div[@class='main']//div[@class='tab-contain']");
 			if(tagNodes != null){
 				for(TagNode tabNode : tagNodes){
-					TagNode h3Node = HtmlCleanerUtils.getSingleElementByName(tabNode, "h3");
+					TagNode h3Node = HtmlCleanerUtil.getSingleElementByName(tabNode, "h3");
 					if(h3Node != null){
 						String h3Text = h3Node.getText().toString().trim();
 						
 						//借款人信息
 						if(h3Text.indexOf("借款人信息") >= 0){
-							TagNode[] spanArr = HtmlCleanerUtils.getMultiNode(tabNode, "//span");
+							TagNode[] spanArr = HtmlCleanerUtil.getMultiNode(tabNode, "//span");
 							if(spanArr != null){
 								//性别
 								bean.setSex(spanArr[0].getText().toString().replaceAll("\"", "").trim());
@@ -287,7 +287,7 @@ public class BorrowDetail {
 						
 						//统计信息
 						if(h3Text.indexOf("统计信息") >= 0){
-							TagNode[] spanArr = HtmlCleanerUtils.getMultiNode(tabNode, "//span[@class='num']");
+							TagNode[] spanArr = HtmlCleanerUtil.getMultiNode(tabNode, "//span[@class='num']");
 							if(spanArr != null){
 								//成功借款次数
 								bean.setSuccessNumber(Integer.valueOf(spanArr[0].getText().toString().replace("次", "").trim()));
@@ -343,11 +343,11 @@ public class BorrowDetail {
 	public List<NeedReturnRecordNext6MonthVo> getNeedReturnRecordNext6MonthVos() {
 		List<NeedReturnRecordNext6MonthVo> needReturnRecordNext6MonthVos = new ArrayList<NeedReturnRecordNext6MonthVo>();
 		try {
-			TagNode[] tableArr = HtmlCleanerUtils.getMultiNode(rootNode, "//div[@class='main']//div[@class='lendDetailTab_tabContent w1000center']//div[@class='tab-contain']//table[@class='lendDetailTab_tabContent_table1 normal']");
+			TagNode[] tableArr = HtmlCleanerUtil.getMultiNode(rootNode, "//div[@class='main']//div[@class='lendDetailTab_tabContent w1000center']//div[@class='tab-contain']//table[@class='lendDetailTab_tabContent_table1 normal']");
 			if(tableArr != null){
 				if(tableArr.length > 1){
 					//未来6个月的待还记录
-					TagNode[] tdArr = HtmlCleanerUtils.getMultiNode(tableArr[1], "//tr[1]/td");
+					TagNode[] tdArr = HtmlCleanerUtil.getMultiNode(tableArr[1], "//tr[1]/td");
 					for (TagNode tagNode : tdArr) {
 						try {
 							NeedReturnRecordNext6MonthVo needReturnRecordNext6MonthVo = new NeedReturnRecordNext6MonthVo();
@@ -362,7 +362,7 @@ public class BorrowDetail {
 						}
 					}
 					
-					tdArr = HtmlCleanerUtils.getMultiNode(tableArr[1], "//tr[2]/td");
+					tdArr = HtmlCleanerUtil.getMultiNode(tableArr[1], "//tr[2]/td");
 					for (int i = 0; i < tdArr.length; i++) {
 						try {
 							double amount = Double.valueOf(tdArr[i].getText().toString().replace("¥", "").replace(",", "").trim());
@@ -384,11 +384,11 @@ public class BorrowDetail {
 		List<OverTimeRecordLast6MonthVo> overTimeRecordLast6MonthVos = new ArrayList<OverTimeRecordLast6MonthVo>();
 		
 		try {
-				TagNode[] tableArr = HtmlCleanerUtils.getMultiNode(rootNode, "//div[@class='main']//div[@class='lendDetailTab_tabContent w1000center']//div[@class='tab-contain']//table[@class='lendDetailTab_tabContent_table1 normal']");
+				TagNode[] tableArr = HtmlCleanerUtil.getMultiNode(rootNode, "//div[@class='main']//div[@class='lendDetailTab_tabContent w1000center']//div[@class='tab-contain']//table[@class='lendDetailTab_tabContent_table1 normal']");
 				if(tableArr != null){
 					if(tableArr.length > 2){
 						//过去6个月有回款记录的逾期天数
-						TagNode[] tdArr = HtmlCleanerUtils.getMultiNode(tableArr[2], "//tr[1]/td");
+						TagNode[] tdArr = HtmlCleanerUtil.getMultiNode(tableArr[2], "//tr[1]/td");
 						for(TagNode tdNode : tdArr){
 							try {
 								OverTimeRecordLast6MonthVo overTimeRecordLast6MonthVo = new OverTimeRecordLast6MonthVo();
@@ -403,7 +403,7 @@ public class BorrowDetail {
 							}
 						}
 						
-						tdArr = HtmlCleanerUtils.getMultiNode(tableArr[2], "//tr[2]/td");
+						tdArr = HtmlCleanerUtil.getMultiNode(tableArr[2], "//tr[2]/td");
 						for (int i = 0; i < tdArr.length; i++) {
 							try {
 								int dayNumber = Integer.valueOf(tdArr[i].getText().toString().trim());

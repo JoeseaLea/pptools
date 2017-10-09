@@ -13,7 +13,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.util.Cookie;
 
-public class PPDtools {
+public class PPDtool {
 	
 	public static WebClient webClient = null;
 	private static Set<Cookie> cookies = null;

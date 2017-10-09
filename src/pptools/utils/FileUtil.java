@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
-public class FileUtils {
+public class FileUtil {
 	public static boolean writeFile(String filePath, String data){
 		OutputStreamWriter writer = null;
 		boolean result = false;

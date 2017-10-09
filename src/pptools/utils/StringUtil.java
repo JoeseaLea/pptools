@@ -2,7 +2,7 @@ package pptools.utils;
 
 
 
-public class StringUtils {
+public class StringUtil {
 	public static String trimToEmpty(String text){
 		if(text == null){
 			return "";

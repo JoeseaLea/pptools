@@ -19,9 +19,10 @@ import pptools.dao.impl.BlackListDaoImpl;
 import pptools.dao.impl.BorrowDetailDaoImpl;
 import pptools.htmlpage.analysis.BlackList;
 import pptools.htmlpage.analysis.BorrowDetail;
-import pptools.utils.FileUtils;
+import pptools.utils.DownloadHtmlPageUtil;
+import pptools.utils.FileUtil;
 import pptools.utils.PPDUtil;
-import pptools.utils.PPDtools;
+import pptools.utils.PPDtool;
 import pptools.utils.PropertiesUtil;
 import pptools.vo.BidDebtRecordVo;
 import pptools.vo.BidRecordVo;
@@ -56,8 +57,8 @@ public class PPDmain {
 			
 			//登录
 			for (int i = 1; i <= maxLoginTimes; i ++) {
-				htmlPage = PPDtools.login(username, password);
-				if (PPDtools.isLoginSuccess()) {
+				htmlPage = PPDtool.login(username, password);
+				if (PPDtool.isLoginSuccess()) {
 					break;
 				}
 				
@@ -70,10 +71,10 @@ public class PPDmain {
 				} catch (InterruptedException e) { }
 			}
 			
-			htmlPage = PPDtools.getUrlPage("http://invest.ppdai.com/account/lend");
+			htmlPage = PPDtool.getUrlPage("http://invest.ppdai.com/account/lend");
 			System.out.println(htmlPage.asText());
 			// 获取黑名单页面
-			htmlPage = PPDtools.getUrlPage("http://invest.ppdai.com/account/blacklistnew");
+			htmlPage = PPDtool.getUrlPage("http://invest.ppdai.com/account/blacklistnew");
 			
 			List<BlacklistVo> blacklist = null;
 			List<RepaymentDetailVo> repaymentDetails = null;
@@ -115,10 +116,10 @@ public class PPDmain {
 							url = htmlElement.getOneHtmlElementByAttribute("a", "class", "c39a1ea fs16").getAttribute("href");
 							listingid = htmlElement.getAttribute("listingid");
 							
-							htmlDetailPage = PPDtools.getUrlPage(url);
+							htmlDetailPage = PPDtool.getUrlPage(url);
 							
 							//保存htmlDetailPage文件
-							saveHtmlPage(url, htmlDetailPage.asXml());
+							DownloadHtmlPageUtil.saveHtmlPage(url, htmlDetailPage.asXml());
 							
 							//加载网页
 							bd.loadPage(htmlDetailPage, listingid);
@@ -160,7 +161,7 @@ public class PPDmain {
 					if (bk.isLastPage(htmlPage)) {
 						break;
 					} else {
-						htmlPage = PPDtools.getUrlPage(bk.getNextHtmlPageURL(htmlPage));
+						htmlPage = PPDtool.getUrlPage(bk.getNextHtmlPageURL(htmlPage));
 					}
 					
 					PPDUtil.sleep(Integer.valueOf(PropertiesUtil.getInstance().getProperty("interval_time", "1000")));
@@ -177,25 +178,6 @@ public class PPDmain {
 			e.printStackTrace();
 		} finally {
 			ctx.close();
-		}
-	}
-
-	/**
-	 * 保存html页面<br>
-	 * 说明：保存html页面时，文件名以访问的url的末尾数字作为文件名
-	 * @param url html页面访问url
-	 * @param htmlPageContent html页面内容
-	 */
-	private static void saveHtmlPage(String url, String htmlPageContent) {
-		try {
-			String[] urlSplit = url.split("/");
-			String htmlFileName = urlSplit[urlSplit.length - 1];
-			
-			String filePath = PropertiesUtil.getInstance().getProperty("file_path", "D:\\ppdai") + File.separator + htmlFileName + ".html";
-			
-			FileUtils.writeFile(filePath, htmlPageContent);
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 }

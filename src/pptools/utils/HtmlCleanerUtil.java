@@ -5,7 +5,7 @@ import org.htmlcleaner.TagNode;
 /**
  * HtmlCleaner工具类
  */
-public class HtmlCleanerUtils {
+public class HtmlCleanerUtil {
 	public static TagNode getSingleNode(TagNode parentNode, String xpath){
 		try{
 			Object[] nodes = parentNode.evaluateXPath(xpath);

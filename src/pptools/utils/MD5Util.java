@@ -3,7 +3,7 @@ package pptools.utils;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 
-public class MD5Utils {
+public class MD5Util {
 	public static String getMD5(String str) {
 		try {
 			// 生成一个MD5加密计算摘要

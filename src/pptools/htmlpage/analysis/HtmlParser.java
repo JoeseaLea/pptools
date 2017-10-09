@@ -7,8 +7,8 @@ import java.util.Date;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 
-import pptools.utils.HtmlCleanerUtils;
-import pptools.utils.StringUtils;
+import pptools.utils.HtmlCleanerUtil;
+import pptools.utils.StringUtil;
 import pptools.vo.HtmlParseVo;
 
 /**
@@ -31,55 +31,55 @@ public class HtmlParser {
 			
 			
 			//魔镜等级
-			TagNode tagNode = HtmlCleanerUtils.getSingleNode(rootNode, "//div[@class='newLendDetailInfoLeft']/a[@class='altQust']/span");
+			TagNode tagNode = HtmlCleanerUtil.getSingleNode(rootNode, "//div[@class='newLendDetailInfoLeft']/a[@class='altQust']/span");
 			if(tagNode != null){
-				String creditRating = StringUtils.trimToEmpty(tagNode.getAttributeByName("class")).replace("creditRating", "").trim();
+				String creditRating = StringUtil.trimToEmpty(tagNode.getAttributeByName("class")).replace("creditRating", "").trim();
 				bean.setField2(creditRating);
 			}
 
 			
-			TagNode[] tagNodes = HtmlCleanerUtils.getMultiNode(rootNode, "//div[@class='newLendDetailMoneyLeft']/dl");
+			TagNode[] tagNodes = HtmlCleanerUtil.getMultiNode(rootNode, "//div[@class='newLendDetailMoneyLeft']/dl");
 			if(tagNodes != null){
 				TagNode node;
 				
 				//借款金额
-				node = HtmlCleanerUtils.getSingleElementByName(tagNodes[0], "dd");
+				node = HtmlCleanerUtil.getSingleElementByName(tagNodes[0], "dd");
 				if(node != null){
 					bean.setField3(node.getText().toString().replace("¥", "").replace(",", "").trim());
 				}
 				
 				//年利率
-				node = HtmlCleanerUtils.getSingleElementByName(tagNodes[1], "dd");
+				node = HtmlCleanerUtil.getSingleElementByName(tagNodes[1], "dd");
 				if(node != null){
 					bean.setField4(node.getText().toString().replace("%", "").trim());
 				}
 				
 				//期限
-				node = HtmlCleanerUtils.getSingleElementByName(tagNodes[2], "dd");
+				node = HtmlCleanerUtil.getSingleElementByName(tagNodes[2], "dd");
 				if(node != null){
 					bean.setField5(node.getText().toString().replace("个月", "").trim());
 				}
 			}
 			
 			//还款结束时间
-			TagNode repayNode = HtmlCleanerUtils.getSingleNode(rootNode, "//div[@class='newLendDetailRefundLeft']//div[@class='item']");
+			TagNode repayNode = HtmlCleanerUtil.getSingleNode(rootNode, "//div[@class='newLendDetailRefundLeft']//div[@class='item']");
 			if(repayNode != null){
-				if(StringUtils.trimToEmpty(repayNode.getText().toString()).indexOf("结束时间") >= 0){
-					String leftTime = HtmlCleanerUtils.getSingleNodeText(repayNode, "//span[@id='leftTime']/text()");
+				if(StringUtil.trimToEmpty(repayNode.getText().toString()).indexOf("结束时间") >= 0){
+					String leftTime = HtmlCleanerUtil.getSingleNodeText(repayNode, "//span[@id='leftTime']/text()");
 					bean.setField5_1(leftTime);
 				}
 			}
 			
-			tagNodes = HtmlCleanerUtils.getMultiNode(rootNode, "//div[@class='main']//div[@class='tab-contain']");
+			tagNodes = HtmlCleanerUtil.getMultiNode(rootNode, "//div[@class='main']//div[@class='tab-contain']");
 			if(tagNodes != null){
 				for(TagNode tabNode : tagNodes){
-					TagNode h3Node = HtmlCleanerUtils.getSingleElementByName(tabNode, "h3");
+					TagNode h3Node = HtmlCleanerUtil.getSingleElementByName(tabNode, "h3");
 					if(h3Node != null){
 						String h3Text = h3Node.getText().toString().trim();
 						
 						//借款人信息
 						if(h3Text.indexOf("借款人信息") >= 0){
-							TagNode[] spanArr = HtmlCleanerUtils.getMultiNode(tabNode, "//span");
+							TagNode[] spanArr = HtmlCleanerUtil.getMultiNode(tabNode, "//span");
 							if(spanArr != null){
 								//性别
 								String sex = spanArr[0].getText().toString();
@@ -104,7 +104,7 @@ public class HtmlParser {
 						
 						//统计信息
 						if(h3Text.indexOf("统计信息") >= 0){
-							TagNode[] spanArr = HtmlCleanerUtils.getMultiNode(tabNode, "//span[@class='num']");
+							TagNode[] spanArr = HtmlCleanerUtil.getMultiNode(tabNode, "//span[@class='num']");
 							if(spanArr != null){
 								//成功借款次数
 								bean.setField9(spanArr[0].getText().toString().replace("次", "").trim());
@@ -134,13 +134,13 @@ public class HtmlParser {
 								bean.setField21(spanArr[11].getText().toString().replace("¥", "").replace(",", "").trim());
 							}
 
-							TagNode[] tableArr = HtmlCleanerUtils.getMultiNode(tabNode, "//table[@class='lendDetailTab_tabContent_table1 normal']");
+							TagNode[] tableArr = HtmlCleanerUtil.getMultiNode(tabNode, "//table[@class='lendDetailTab_tabContent_table1 normal']");
 							if(tableArr != null){
 								if(tableArr.length > 0){
 									//历史成功借款列表
-									TagNode trNode = HtmlCleanerUtils.getSingleNode(tableArr[0], "//tr[@class='tab-list'][1]");
+									TagNode trNode = HtmlCleanerUtil.getSingleNode(tableArr[0], "//tr[@class='tab-list'][1]");
 									if(trNode != null){
-										TagNode[] tdArr = HtmlCleanerUtils.getMultiElementByName(trNode, "td");
+										TagNode[] tdArr = HtmlCleanerUtil.getMultiElementByName(trNode, "td");
 										
 										//是否短借
 										String qx = tdArr[2].getText().toString().trim();
@@ -158,7 +158,7 @@ public class HtmlParser {
 								if(tableArr.length > 1){
 									//未来6个月的待还记录
 									double repay = 0.0;
-									TagNode[] tdArr = HtmlCleanerUtils.getMultiNode(tableArr[1], "//tr[2]/td");
+									TagNode[] tdArr = HtmlCleanerUtil.getMultiNode(tableArr[1], "//tr[2]/td");
 									for(TagNode tdNode : tdArr){
 										String value = tdNode.getText().toString().replace("¥", "").replace(",", "").trim();
 										if(Double.parseDouble(value) > repay){
@@ -173,7 +173,7 @@ public class HtmlParser {
 								if(tableArr.length > 2){
 									//过去6个月有回款记录的逾期天数
 									int days = 0;
-									TagNode[] tdArr = HtmlCleanerUtils.getMultiNode(tableArr[2], "//tr[2]/td");
+									TagNode[] tdArr = HtmlCleanerUtil.getMultiNode(tableArr[2], "//tr[2]/td");
 									for(TagNode tdNode : tdArr){
 										String value = tdNode.getText().toString().trim();
 										days += Integer.parseInt(value);
@@ -187,7 +187,7 @@ public class HtmlParser {
 						
 						//投标记录
 						if(h3Text.indexOf("投标记录") >= 0){
-							TagNode[] olArr = HtmlCleanerUtils.getMultiNode(tabNode, "//div[@class='scroll-area']/ol");
+							TagNode[] olArr = HtmlCleanerUtil.getMultiNode(tabNode, "//div[@class='scroll-area']/ol");
 							if(olArr != null){
 								String currentTime = "";
 								String lastTime = "";
@@ -198,10 +198,10 @@ public class HtmlParser {
 									TagNode olNode = olArr[i];
 									
 									//name
-									String name = HtmlCleanerUtils.getSingleNodeText(olNode, "//li[1]/a[@class='listname']/text()");
+									String name = HtmlCleanerUtil.getSingleNodeText(olNode, "//li[1]/a[@class='listname']/text()");
 									
 									//time
-									currentTime = HtmlCleanerUtils.getSingleNodeText(olNode, "//li[5]/text()");
+									currentTime = HtmlCleanerUtil.getSingleNodeText(olNode, "//li[5]/text()");
 									if(i == 0){
 										lastTime = currentTime;
 									}
@@ -210,7 +210,7 @@ public class HtmlParser {
 										exists = true;
 										
 										//amount
-										amount = HtmlCleanerUtils.getSingleNodeText(olNode, "//li[4]/text()").toString().replace("¥", "").trim();
+										amount = HtmlCleanerUtil.getSingleNodeText(olNode, "//li[4]/text()").toString().replace("¥", "").trim();
 									}
 								}
 								
@@ -236,18 +236,18 @@ public class HtmlParser {
 						
 						//还款记录
 						if(h3Text.indexOf("还款记录") >= 0){
-							TagNode[] trArr = HtmlCleanerUtils.getMultiNode(tabNode, "//table[@class='lendDetailTab_tabContent_table1 pay-record']//tr");
+							TagNode[] trArr = HtmlCleanerUtil.getMultiNode(tabNode, "//table[@class='lendDetailTab_tabContent_table1 pay-record']//tr");
 							if(trArr != null){
 								for(int i=1; i<trArr.length; i++){ //行
 									TagNode trNode = trArr[i];
-									TagNode[] tdArr = HtmlCleanerUtils.getMultiElementByName(trNode, "td");
-									String repayStatus = HtmlCleanerUtils.getSingleNodeText(tdArr[6], "//span/text()");
+									TagNode[] tdArr = HtmlCleanerUtil.getMultiElementByName(trNode, "td");
+									String repayStatus = HtmlCleanerUtil.getSingleNodeText(tdArr[6], "//span/text()");
 									if(repayStatus.indexOf("等待还款") >= 0){
 										//逾期的期次
 										bean.setField22_4(String.valueOf(i));
 										
 										//逾期天数
-										String overdueDays = HtmlCleanerUtils.getSingleNodeText(tdArr[5], "//span/text()");
+										String overdueDays = HtmlCleanerUtil.getSingleNodeText(tdArr[5], "//span/text()");
 										bean.setField22_5(overdueDays.replace("/", "").replace("天", "").trim());
 									}
 								}
