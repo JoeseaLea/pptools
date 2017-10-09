@@ -54,6 +54,13 @@ public class PPDtools {
 		// 拿到这个网页
         HtmlPage page = webClient.getPage("https://ac.ppdai.com/User/Login?message=&Redirect=");
 
+        Set<Cookie> cookies = webClient.getCookieManager().getCookies();
+//        Iterator<Cookie> it = cookies.iterator();
+        StringBuilder cookiessb = new StringBuilder();
+        for (Cookie cookie : cookies) {
+        		cookiessb.append("; " + cookie.getName() + "=" + cookie.getValue());
+		}
+        
         // 填入用户名和密码
         HtmlInput inputUsername = (HtmlInput) page.getElementById("UserName");
         inputUsername.type(username);

@@ -175,8 +175,9 @@ public class PPDmain {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			ctx.close();
 		}
-		ctx.close();
 	}
 
 	/**
